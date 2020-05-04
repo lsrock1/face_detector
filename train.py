@@ -131,6 +131,7 @@ def main(_):
                 load_t0 = time.time()
                 total_loss, losses = train_step(inputs, labels)
                 avg_loss = (avg_loss * step + total_loss.numpy()) / (step + 1)
+                # print(avg_loss)
                 load_t1 = time.time()
                 batch_time = load_t1 - load_t0
 

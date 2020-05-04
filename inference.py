@@ -92,6 +92,7 @@ def main(_):
             exit()
         print("[*] Predict {} image.. ".format(FLAGS.img_path))
         img_raw = cv2.imread(FLAGS.img_path)
+        img_raw = cv2.resize(img_raw, (320, 240))
         img_height_raw, img_width_raw, _ = img_raw.shape
         img = np.float32(img_raw.copy())
 
@@ -99,7 +100,7 @@ def main(_):
         # pad input image to avoid unmatched shape problem
         img, pad_params = pad_input_image(img, max_steps=max(cfg['steps']))
         img = img / 255.0 - 0.5
-
+        print(img.shape)
         priors, _ = priors_box(cfg, image_sizes = (img.shape[0], img.shape[1]))
         priors = tf.cast(priors, tf.float32)
 
@@ -119,12 +120,12 @@ def main(_):
             show_image(img_raw, boxes, classes, scores, img_height_raw, img_width_raw, prior_index,cfg['labels_list'])
 
         cv2.imwrite(save_img_path, img_raw)
-        cv2.imshow('results', img_raw)
-        if cv2.waitKey(0) == ord('q'):
-            exit(0)
+        # cv2.imshow('results', img_raw)
+        # if cv2.waitKey(0) == ord('q'):
+        #     exit(0)
 
     else:
-        capture = cv2.VideoCapture(0)
+        capture = cv2.VideoCapture(FLAGS.img_path)
         capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
         capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
 

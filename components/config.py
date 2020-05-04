@@ -6,14 +6,14 @@ cfg = {
     # training dataset
     "dataset_path": 'dataset/train_mask.tfrecord',  # 'dataset/trainval_mask.tfrecord'
     "val_path": 'dataset/val_mask.tfrecord',  #
-    "dataset_len": 6115,  # train 6115 , trainval 7954, number of training samples
-    "val_len": 1839,
+    "dataset_len": 12880,  # train 6115 , trainval 7954, number of training samples
+    "val_len": 3226,
     "using_crop": True,
     "using_bin": True,
     "using_flip": True,
     "using_distort": True,
     "using_normalizing": True,
-    "labels_list": ['background', 'mask', 'unmask'],  # xml annotation
+    "labels_list": ['background', 'face'],  # xml annotation
 
     # anchor setting
     # "min_sizes": [[(9, 7), (24, 20), (39, 35)], [(54, 41), (65, 61), (81, 66)],
@@ -38,7 +38,7 @@ cfg = {
 
     "weights_decay": 5e-4,
     "momentum": 0.9,
-    "save_freq": 1, #frequency of save model weights
+    "save_freq": 10, #frequency of save model weights
 
     # inference
     "score_threshold": 0.5,
