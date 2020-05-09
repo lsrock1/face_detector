@@ -13,9 +13,9 @@ sys.path.append(rootPath)
 
 from components import config
 
-flags.DEFINE_string('dataset_path', 'widerface', 'VOC format dataset')
-flags.DEFINE_string('output_file', rootPath+'/dataset/train_mask.tfrecord', 'TFRecord file:output dataset')
-flags.DEFINE_enum('split', 'train', ['train', 'val'], 'train or val dataset')
+# flags.DEFINE_string('dataset_path', 'widerface', 'VOC format dataset')
+# flags.DEFINE_string('output_file', rootPath+'/dataset/train_mask.tfrecord', 'TFRecord file:output dataset')
+# flags.DEFINE_enum('split', 'train', ['train', 'val'], 'train or val dataset')
 
 
 
@@ -199,7 +199,7 @@ def make_example(image_string, image_info_list):
 
 
 def main(argv):
-    dataset_path = FLAGS.dataset_path
+    dataset_path = 'widerface'
 
     if not os.path.isdir(dataset_path):
         logging.info('Please define valid dataset path.')
@@ -208,61 +208,49 @@ def main(argv):
 
     logging.info('Reading configuration...')
 
+    for split in ['train', 'val']:
+        output_file = rootPath+'/dataset/train_mask.tfrecord' if split == 'train' else rootPath+'/dataset/val_mask.tfrecord'
 
+        with tf.io.TFRecordWriter(output_file) as writer:
+            
+            counter = 0
+            skipped = 0
+            anno_txt = 'wider_face_train_bbx_gt.txt' if split == 'train' else 'wider_face_val_bbx_gt.txt'
+            file_path = 'WIDER_train' if split == 'train' else 'WIDER_val'
+            for info in tqdm.tqdm(parse_widerface(os.path.join(dataset_path, 'wider_face_split', anno_txt))):
+                image_file = os.path.join(dataset_path, file_path, 'images', info[0])
 
-    # class_list = config.cfg['labels_list']
+                error, image_string, image_data = process_image(image_file)
+                boxes = xywh_to_voc(image_file, info[1], image_data)
 
-    # logging.info("Class dictionary loaded: %s", class_list)
+                if not error:
+                    tf_example = make_example(image_string, [boxes])
 
-    if os.path.exists(FLAGS.output_file):
-        logging.info('{:s} already exists. Exit...'.format(
-            FLAGS.output_file))
-        exit()
+                    writer.write(tf_example.SerializeToString())
+                    counter += 1
 
-    with tf.io.TFRecordWriter(FLAGS.output_file) as writer:
-        # img_list = open(
-        #     os.path.join(FLAGS.dataset_path, 'ImageSets', 'Main', '%s.txt' % FLAGS.split)).read().splitlines()
-        # logging.info("Image list loaded: %d", len(img_list))
-        counter = 0
-        skipped = 0
-        split = 'wider_face_train_bbx_gt.txt' if FLAGS.split == 'train' else 'wider_face_val_bbx_gt.txt'
-        file_path = 'WIDER_train' if FLAGS.split == 'train' else 'WIDER_val'
-        for info in tqdm.tqdm(parse_widerface(os.path.join(FLAGS.dataset_path, 'wider_face_split', split))):
-            image_file = os.path.join(FLAGS.dataset_path, file_path, 'images', info[0])
-            # print(image_file)
-            # print(os.path.exists(image_file))
+                else:
+                    skipped += 1
+                    logging.info('Skipped {:d} of {:d} images.'.format(skipped, len(img_list)))
 
-            error, image_string, image_data = process_image(image_file)
-            boxes = xywh_to_voc(image_file, info[1], image_data)
-            # image_info_list = parse_annot(annot_file, class_list)
-            if not error:
-                tf_example = make_example(image_string, [boxes])
+            # for image in tqdm.tqdm(img_list):
+            #     image_file = os.path.join(FLAGS.dataset_path, 'JPEGImages', '%s.jpg' % image)
+            #     annot_file = os.path.join(FLAGS.dataset_path, 'Annotations', '%s.xml' % image)
 
-                writer.write(tf_example.SerializeToString())
-                counter += 1
+            #     # processes the image and parse the annotation
+            #     error, image_string, image_data = process_image(image_file)
+            #     image_info_list = parse_annot(annot_file, class_list)
+            #     if not error:
+            #         tf_example = make_example(image_string, image_info_list)
 
-            else:
-                skipped += 1
-                logging.info('Skipped {:d} of {:d} images.'.format(skipped, len(img_list)))
+            #         writer.write(tf_example.SerializeToString())
+            #         counter += 1
 
-        # for image in tqdm.tqdm(img_list):
-        #     image_file = os.path.join(FLAGS.dataset_path, 'JPEGImages', '%s.jpg' % image)
-        #     annot_file = os.path.join(FLAGS.dataset_path, 'Annotations', '%s.xml' % image)
+            #     else:
+            #         skipped += 1
+            #         logging.info('Skipped {:d} of {:d} images.'.format(skipped, len(img_list)))
 
-        #     # processes the image and parse the annotation
-        #     error, image_string, image_data = process_image(image_file)
-        #     image_info_list = parse_annot(annot_file, class_list)
-        #     if not error:
-        #         tf_example = make_example(image_string, image_info_list)
-
-        #         writer.write(tf_example.SerializeToString())
-        #         counter += 1
-
-        #     else:
-        #         skipped += 1
-        #         logging.info('Skipped {:d} of {:d} images.'.format(skipped, len(img_list)))
-
-    logging.info('Wrote {} images to {}'.format(counter, FLAGS.output_file))
+        logging.info('Wrote {} images to {}'.format(counter, output_file))
 
 if __name__ == '__main__':
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'

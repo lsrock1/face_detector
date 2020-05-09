@@ -1,19 +1,20 @@
-# Face mask detection
+# Face detection
 
+This repo is based on [this repo](https://github.com/PureHing/face-mask-detection-tf2)
 
 This model is a lightweight face mask detection model. Based on ssd,the backbone is Mobilenet and RFB.
  
 
-## Key Features
+<!-- ## Key Features
 
 - [x] Tensorflow 2.1
 - [x] Trainging and Inference
 - [x] Precision with mAP
 - [x] Eager mode training with `tf.GradientTape`
 - [x] Network function with `tf.keras`
-- [x] Dataset prepocessing with `tf.data.TFRecordDataset`
+- [x] Dataset prepocessing with `tf.data.TFRecordDataset` -->
 
-```bash
+<!-- ```bash
 ├── assets
 │   ├── 1_Handshaking_Handshaking_1_71.jpg
 │   ├── out_1_Handshaking_Handshaking_1_71.jpg
@@ -62,7 +63,7 @@ This model is a lightweight face mask detection model. Based on ssd,the backbone
 ├── README.md
 └── train.py
 └── requirements.txt
-```
+``` -->
 
 ## Usage
 
@@ -72,33 +73,57 @@ Create a new python virtual environment by [Anaconda](https://www.anaconda.com/)
 
 ### Data Preparing
 
-1. Face Mask Data
+1. Wider Face Data
 
-   Source data from  [**AIZOOTech**](https://github.com/AIZOOTech/FaceMaskDetection)  , which is a great job. 
+  Run wider face download script
+  ```bash
+    python data_downloader.py
+  ```
 
-   I checked  and corrected some error to apply my own training network according to the voc dataset format. You can download it here. [https://pan.baidu.com/s/1nc-cBNAqPIYYAmtGSFUSmg](https://pan.baidu.com/s/1nc-cBNAqPIYYAmtGSFUSmg) code:44pl
+  Unzip dataset
+  ```bash
+    cd widerface
+    unzip -qq WIDER_train.zip
+    unzip -qq WIDER_val.zip
+    unzip -qq WIDER_test.zip
+    unzip -qq wider_face_split.zip
+  ```
+  #### If you get error during unzip, download files in following links to widerface folder.
+  * [WIDER_train.zip](https://drive.google.com/file/d/0B6eKvaijfFUDQUUwd21EckhUbWs/view)
+  * [WIDER_val.zip](https://drive.google.com/file/d/0B6eKvaijfFUDd3dIRmpvSk8tLUk/view)
+  * [WIDER_test.zip](https://drive.google.com/file/d/0B6eKvaijfFUDbW4tdGpaYjgzZkU/view)
+  * [wider_face_split.zip](http://mmlab.ie.cuhk.edu.hk/projects/WIDERFace/support/bbx_annotation/wider_face_split.zip)
 
 2. Data Processing
-
-   + Download the mask data images 
 
    + Convert the training images and annotations to tfrecord file with the the script bellow.
 
      ```bash
-     python dataset/voc_to_tfrecord.py --dataset_path Maskdata/  --output_file dataset/train_mask.tfrecord --split train
+     python dataset/voc_to_tfrecord.py
      ```
 
-     you can change the --split parameters to 'val' to get the validation tfrecord, Please modify the inside setting `voc_to_tfrecord.py` for different situations.
+### With your dataset(COCO style annotation)
 
-3. Check tfrecord dataloader by run `python dataset/check_dataset.py` .
+1. Place your images and annotations in my_dataset folder
+    ```bash
+    my_dataset
+    ├── my_image1.jpg
+    ├── my_image1.xml
+    ├── my_image2.jpg
+    ├── my_image2.xml
+    ├── ...
+    └── ...
+    ```
+
+2. Data Processing
+   + Convert your dataset to tf record
+   ```bash
+     python dataset/voc_to_tfrecord.py
+     ```
 
 ### Training
 
-1. Modify your configuration in `components/config.py`. 
-
-   You can get the anchors by run `python components/kmeans.py`
-
-2. Train the model by run `python train.py` .
+1. Train the model by run `python train.py` .
 
 ### Inference
 
@@ -113,25 +138,9 @@ Create a new python virtual environment by [Anaconda](https://www.anaconda.com/)
 + Detect on Image
 
   ```bash
-  python inference.py  --model_path checkpoints/*.h5 --img_path assert/1_Handshaking_Handshaking_1_71.jpg
+  python inference.py  --model_path checkpoints/ --img_path assert/1_Handshaking_Handshaking_1_71.jpg
   ```
 
   ![](https://raw.githubusercontent.com/PureHing/face-mask-detection-tf2/master/assets/out_test_00002330.jpg)
 
   ![](https://raw.githubusercontent.com/PureHing/face-mask-detection-tf2/master/assets/out_1_Handshaking_Handshaking_1_71.jpg)
-  
-
-### mAP
-
-+ Convert xml to txt file on  `mAP/ground truth`, predicting  the bbox and class on `mAP/detection-results`.
-
-  ```bash
-   python mAP/detect.py --model_path checkpoints/ --dataset_path Maskdata/ --split val 
-  
-   python mAP/compute_mAP.py
-  ```
-
-# Reference
-+ mAP code: [https://github.com/Cartucho/mAP](https://github.com/Cartucho/mAP)
-+ SSD-Tensorflow: [https://github.com/balancap/SSD-Tensorflow](https://github.com/balancap/SSD-Tensorflow/)
-+ ssd-tf2: [https://github.com/ChunML/ssd-tf2](https://github.com/ChunML/ssd-tf2)
