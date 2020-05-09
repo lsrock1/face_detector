@@ -141,5 +141,5 @@ Create a new python virtual environment by [Anaconda](https://www.anaconda.com/)
   python inference.py  --model_path checkpoints/ --img_path assert/1_Handshaking_Handshaking_1_71.jpg
   ```
 
-  ![](assets/out_sc.jpg)
+  ![example](assets/out_sc.png)
   
