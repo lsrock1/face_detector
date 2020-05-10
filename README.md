@@ -140,7 +140,7 @@ Create a new python virtual environment by [Anaconda](https://www.anaconda.com/)
   ```bash
   python inference.py  --model_path checkpoints/ --img_path assert/1_Handshaking_Handshaking_1_71.jpg
   ```
+  * Check the output file in assets/ folder.
 
   ![](https://raw.githubusercontent.com/PureHing/face-mask-detection-tf2/master/assets/out_test_00002330.jpg)
 
-  ![](https://raw.githubusercontent.com/PureHing/face-mask-detection-tf2/master/assets/out_1_Handshaking_Handshaking_1_71.jpg)
