@@ -142,5 +142,4 @@ Create a new python virtual environment by [Anaconda](https://www.anaconda.com/)
   ```
   * Check the output file in assets/ folder.
 
-  ![](https://raw.githubusercontent.com/PureHing/face-mask-detection-tf2/master/assets/out_test_00002330.jpg)
-
+  ![example](assets/out_sc.png)
