@@ -88,7 +88,7 @@ Create a new python virtual environment by [Anaconda](https://www.anaconda.com/)
     unzip -qq WIDER_test.zip
     unzip -qq wider_face_split.zip
   ```
-  #### If you get error during unzip, download files in following links to widerface folder.
+  #### If you get error during unzip, download files in the following links into the widerface folder.
   * [WIDER_train.zip](https://drive.google.com/file/d/0B6eKvaijfFUDQUUwd21EckhUbWs/view)
   * [WIDER_val.zip](https://drive.google.com/file/d/0B6eKvaijfFUDd3dIRmpvSk8tLUk/view)
   * [WIDER_test.zip](https://drive.google.com/file/d/0B6eKvaijfFUDbW4tdGpaYjgzZkU/view)
@@ -96,7 +96,7 @@ Create a new python virtual environment by [Anaconda](https://www.anaconda.com/)
 
 2. Data Processing
 
-   + Convert the training images and annotations to tfrecord file with the the script bellow.
+   + Convert the training images and annotations to tfrecord file with the the script below.
 
      ```bash
      python dataset/voc_to_tfrecord.py
@@ -118,12 +118,25 @@ Create a new python virtual environment by [Anaconda](https://www.anaconda.com/)
 2. Data Processing
    + Convert your dataset to tf record
    ```bash
-     python dataset/voc_to_tfrecord.py
-     ```
+     python my_dataset/my_data_to_tfrecord.py
+   ```
+
+3. Edit Configuration
+
+  + In components/config.py
+
+  ```bash
+    # Insert my dataset path
+    "dataset_path": ['dataset/train_mask.tfrecord', 'dataset/my_dataset.tfrecord'],
+    "val_path": ['dataset/val_mask.tfrecord'],  #
+    # origin dataset length  + additional my dataset length
+    # 50 is dummy
+    "dataset_len": 12880 + 50
+   ```
 
 ### Training
 
-1. Train the model by run `python train.py` .
+1. Train the model by running `python train.py` .
 
 ### Inference
 
